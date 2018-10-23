@@ -1,4 +1,4 @@
-#ESP8266 Admiralty Tidal API
+# ESP8266 Admiralty Tidal API
 
 An ESP8266 / NodeMCU wrapper around the UK Admiralty's Tidal API.
 
