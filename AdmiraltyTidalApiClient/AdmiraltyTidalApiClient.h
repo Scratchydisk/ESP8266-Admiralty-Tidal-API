@@ -4,7 +4,35 @@
  Author:	Stewart McSporran
  Editor:	http://www.visualmicro.com
 
- Released under MIT license.
+ A library that acts as a client to the UK Admiralty's
+ Tidal forecaset API.
+
+ See https://admiraltyapi.portal.azure-api.net
+
+ Library hosted at https://github.com/Scratchydisk/ESP8266-Admiralty-Tidal-API
+
+ Released under the MIT license.
+
+Copyright (c) 2018 Stewart McSporran
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
 */
 
 #ifndef _AdmiraltyTidalApiClient_h
@@ -17,7 +45,7 @@
 #endif
 
 // Enable this define to see debug messages when using the API
-#define DEBUG_ADMIRALTY
+//#define DEBUG_ADMIRALTY
 
 #ifdef DEBUG_ADMIRALTY
 #define DEBUGV(...) Serial.println(__VA_ARGS__)
@@ -34,6 +62,7 @@
 
 /*******************************/
 
+// Maximum number of predections to parse
 #define MAX_COUNT_TIDAL_EVENTS 30
 
 /**** Status codes *******/
@@ -52,29 +81,35 @@
 * this file hasn't been changed be some third party!
 ****/
 
-// *.azure-api.net
-// Expires 11 Jan 2020
+// API uses an Azure wildcard certificate
+// Subject: *.azure-api.net
+// Expires: 11 Jan 2020
 #define SSL_THUMBRPRINT_API "cb33e927a76acb77c8215aaf4f98a3ff78139069"  
 
-/**** ADMIRALTY TIDAL API URLs *********/
+// Host name of the tidal API
 const String ADMIRALTY_API_HOST = "admiraltyapi.azure-api.net";
 
-// Need to add StationId as a suffix to this call
+// Base API URL to fetch tidal station data.
 const String ADMIRALTY_STATIONS_URL = "https://" + ADMIRALTY_API_HOST + "/uktidalapi/api/V1/Stations/";
 
-// Stores the details of each tidal event
+// Structure to store the details of each tidal event
 struct TidalEvent
 {
+	// True if the tidal forecast is for a high tide
 	bool isHighTide;
 	// ISO 8601 time stamp from API in GMT
 	String dateTime;
-	// Parsed from the dateTime string (in GMT)
+	// Parsed time structure from the dateTime string (in GMT)
 	tmElements_t tm;
 	// Height in metres
 	float heightM;
 };
 
 
+// Client for the UK Admiralty's Tidal API.
+// Only the tidal events (forecasts) are supported.
+// The tidal station details and lists have not been
+// added as I just don't need them right now.
 class AdmiraltyApiClient : public JsonListener
 {
 private:
@@ -96,7 +131,8 @@ protected:
 	virtual void startObject();
 
 public:
-	// Attempt to validate the SSL certificate thumbprint? (Default is false)
+	// If true the connection will attempt to validate the SSL 
+	// certificate against the API certificate's thumbprint. (Default is false)
 	bool validateSslThumbprint;
 
 	// Auth key for the Admiralty API
@@ -105,19 +141,19 @@ public:
 	// Identifier of the tidal station
 	String stationId;
 
-	// Number of tidal events parsed
+	// Number of tidal events stored in the tidalEvents attribute (read only)
 	uint8_t numberEvents;
 
 	// Collection of parsed tidal events
 	TidalEvent tidalEvents[MAX_COUNT_TIDAL_EVENTS];
 
 	// ctor
+	// Defaults the certificate validation to false
 	AdmiraltyApiClient();
 
 	// Read tidal events from the Admiralty API for the supplied station and number of days forecast.
-	// Returns an ADMIRALTY_API status code.
+	// Returns an ADMIRALTY_API_XXX status code.
 	uint8_t FetchTidalEvents(WiFiClientSecure wifiClient, uint8_t numberDays);
-
 };
 
 #endif

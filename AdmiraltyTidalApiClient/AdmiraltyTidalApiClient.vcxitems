@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -15,13 +15,16 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="$(MSBuildThisFileDirectory)readme.txt" />
-	<Text Include="$(MSBuildThisFileDirectory)library.properties" />
-  	<Text Include="$(MSBuildThisFileDirectory)AdmiraltyTidalApiClient.h" />
+    <Text Include="$(MSBuildThisFileDirectory)library.properties" />
+    <Text Include="$(MSBuildThisFileDirectory)AdmiraltyTidalApiClient.h" />
   </ItemGroup>
- <ItemGroup>
+  <ItemGroup>
     <!-- <ClInclude Include="$(MSBuildThisFileDirectory)AdmiraltyTidalApiClient.h" /> -->
+    <None Include="$(MSBuildThisFileDirectory)..\License.txt" />
+    <None Include="$(MSBuildThisFileDirectory)..\README.md" />
+    <None Include="$(MSBuildThisFileDirectory)examples\AdmiraltyExample.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AdmiraltyTidalApiClient.cpp" />
   </ItemGroup>
-  </Project>
+</Project>
