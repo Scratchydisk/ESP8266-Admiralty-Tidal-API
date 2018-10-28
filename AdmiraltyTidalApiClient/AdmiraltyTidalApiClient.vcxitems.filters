@@ -25,6 +25,5 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)..\README.md" />
     <None Include="$(MSBuildThisFileDirectory)..\License.txt" />
-    <None Include="$(MSBuildThisFileDirectory)examples\AdmiraltyExample.ino" />
   </ItemGroup>
 </Project>

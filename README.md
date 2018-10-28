@@ -14,30 +14,72 @@ The [Admiralty Tidal API](https://admiraltyapi.portal.azure-api.net) is hosted a
 
 You will need to register there for your free developer account and API key.
 
-### Simplified Overview
+### Sample Code Fragments
 
-    WiFiClientSecure _wifiClient;
-    AdmiraltyApiClient _tidalApiClient;
+**Obtain a set of tidal event forecasts for the next two days**
 
-    // Initialise the API client's subscription key and station ID
-    _tidalApiClient.apiSubscriptionKey = "123456789abcdef";
-    _tidalApiClient.stationId = "0123";
+```C++    
+WiFiClientSecure _wifiClient;
+AdmiraltyApiClient _tidalApiClient;
 
-    // Fetch 2 days' forecasts
-    _tidalApiClient.FetchTidalEvents(_wifiClient, 2);
+// Initialise the API client's subscription key and station ID
+_tidalApiClient.apiSubscriptionKey = "123456789abcdef";
+_tidalApiClient.stationId = "0123";
 
-    // Enumerate the results
-    for (int i = 0; i < _tidalApiClient.numberEvents; i++)
-    {
-    	TidalEvent te = _tidalApiClient.tidalEvents[i];
+// Fetch 2 days' forecasts
+_tidalApiClient.FetchTidalEvents(_wifiClient, 2);
 
-    	// Do what you wish with the data...
-    	... te.tm.Day
-    	... te.tm.Minute
-    	... te.isHighTide
-    	... te.heightM
-    	etc.
-    }
+// Enumerate the results
+for (int i = 0; i < _tidalApiClient.numberEvents; i++)
+{
+	TidalEvent te = _tidalApiClient.tidalEvents[i];
+
+	// Do what you wish with the data...
+	... te.tm.Day
+ 	... te.tm.Minute
+    ... te.isHighTide
+    ... te.heightM
+    etc.
+}
+```
+Sample Output
+```
+===== Fetched 8 Events =====
+2018-10-28 01:53 GMT  High tide of 3.2m
+2018-10-28 07:21 GMT  Low  tide of 0.5m
+2018-10-28 14:01 GMT  High tide of 3.3m
+2018-10-28 19:40 GMT  Low  tide of 0.5m
+2018-10-29 02:34 GMT  High tide of 3.2m
+2018-10-29 08:06 GMT  Low  tide of 0.6m
+2018-10-29 14:40 GMT  High tide of 3.3m
+2018-10-29 20:26 GMT  Low  tide of 0.6m
+```
+**Get the last and next tidal events (from current time) and display the hours and minutes from/to them**
+```C++
+TidalEvent teBefore = _tidalApiClient.PreviousTidalEvent(now());
+TidalEvent teAfter = _tidalApiClient.NextTidalEvent(now());
+
+if (teBefore.isValid)
+{
+	String tideType = teBefore.isHighTide ? "high" : "low";
+	tmElements_t offset = teBefore.TimeFrom(now());
+	Serial.println(String(offset.Hour) + ":" + String(offset.Minute) + " since last " + tideType + " tide");
+}
+if(teAfter.isValid)
+{
+	String tideType = teAfter.isHighTide ? "high" : "low";
+	tmElements_t offset = teAfter.TimeFrom(now());
+	Serial.println(String(offset.Hour) + ":" + String(offset.Minute) + " until next " + tideType + " tide");
+}
+```
+
+Sample Output (relative to tidal events shown above)
+
+```
+20:39:44
+0:59 since last low tide
+5:54 until next high tide
+```
 
 ### Tidal Station IDs
 
@@ -47,17 +89,7 @@ Once you've registered for your developer account you'll have access to a ["try 
 
 ## Example Sketch
 
-The example sketch shows how to connect to the API and retrieve two days' tidal event forecasts and then output them in the following format via the serial port.
-
-    ===== Fetched 8 Events =====
-    2018-10-23 04:28 GMT  Low  tide of 0.5m
-    2018-10-23 11:10 GMT  High tide of 3.0m
-    2018-10-23 16:37 GMT  Low  tide of 0.8m
-    2018-10-23 23:24 GMT  High tide of 3.1m
-    2018-10-24 05:02 GMT  Low  tide of 0.4m
-    2018-10-24 11:43 GMT  High tide of 3.0m
-    2018-10-24 17:08 GMT  Low  tide of 0.7m
-    2018-10-24 23:58 GMT  High tide of 3.1m
+The example sketch shows how to connect to the API and retrieve two days' tidal event forecasts and then output them in the format shown above via the serial port.
 
 ## Required Libraries
 
@@ -82,4 +114,14 @@ I've always been a fan of clarity over obfuscation and this is reflected in the 
 I strongly recommend the [Barr Group's Embedded C Coding Standard](https://barrgroup.com/Embedded-Systems/Books/Embedded-C-Coding-Standard).
 
 ## Change Log
+* 28 Oct 2018 - Added time related functionality:
+    * TidalEvent structure changed to class
+	* TidalEvent epoch (UNIX) time and isValid attributes
+	* TidalEvent TimeFrom method to get time period between event and supplied time value
+	* PreviousTidalEvent method
+	* NextTidalEvent method
+	
+
 * 23 Oct 2018 - Initial release with example
+
+> Written with [StackEdit](https://stackedit.io/).

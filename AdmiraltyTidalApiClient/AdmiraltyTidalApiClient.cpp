@@ -111,6 +111,72 @@ uint8_t AdmiraltyApiClient::FetchTidalEvents(WiFiClientSecure wifiClient, uint8_
 	return ADMIRALTY_API_SUCCESS;
 }
 
+TidalEvent AdmiraltyApiClient::PreviousTidalEvent(time_t time)
+{
+	TidalEvent bestMatch = TidalEvent();
+
+	// events are stored in time order
+	for (int i = 0; i < numberEvents; i++)
+	{
+		TidalEvent te = tidalEvents[i];
+
+		if (te.epochTime <= time)
+		{
+			bestMatch = te;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	return bestMatch;
+}
+
+TidalEvent AdmiraltyApiClient::NextTidalEvent(time_t time)
+{
+	TidalEvent bestMatch = TidalEvent();
+
+	// events are stored in time order
+	for (int i = 0; i < numberEvents; i++)
+	{
+		TidalEvent te = tidalEvents[i];
+
+		if (te.epochTime > time)
+		{
+			bestMatch = te;
+			break;
+		}
+	}
+
+	return bestMatch;
+}
+
+// Converts the ISO8601 string time representation from the API
+// into time elements.  Fractional parts of seconds are dropped.
+void AdmiraltyApiClient::convertFromIso8601(String time_string, tmElements_t & tm_data)
+{
+	// 2018-10-17T17:25:00
+	// substring offsets:
+	// Y - 0 4
+	// M - 5 7
+	// D - 8 10
+	// H - 11 13
+	// MM - 14 16
+	// S - 17 19
+	// Can be fractional seconds but we'll ignore them
+
+	tm_data.Year = CalendarYrToTm(time_string.substring(0, 4).toInt());
+	tm_data.Month = time_string.substring(5, 7).toInt();
+	tm_data.Day = time_string.substring(8, 10).toInt();
+	tm_data.Hour = time_string.substring(11, 13).toInt();
+	tm_data.Minute = time_string.substring(14, 16).toInt();
+	tm_data.Second = time_string.substring(17, 19).toInt();
+}
+
+/******
+* JSON Parser overrides
+*******/
 
 void AdmiraltyApiClient::whitespace(char c)
 {
@@ -152,6 +218,12 @@ void AdmiraltyApiClient::endArray() {
 
 void AdmiraltyApiClient::endObject() {
 	DEBUGV("end object. ");
+
+	// Set the epoch time and validity of the current tidal event
+	// If we're in here then it's safe to assume we have a valid tidal event
+	tidalEvents[eventIndex].epochTime = makeTime(tidalEvents[eventIndex].tm);
+	tidalEvents[eventIndex].isValid = true;
+
 	if (eventIndex < (MAX_COUNT_TIDAL_EVENTS - 1))
 	{
 		eventIndex++;
@@ -171,25 +243,27 @@ void AdmiraltyApiClient::startObject() {
 	DEBUGV("start object. ");
 }
 
-void AdmiraltyApiClient::convertFromIso8601(String time_string, tmElements_t & tm_data)
+/**********************
+ TidalEvent
+**********************/
+
+// Number of hours and minutes between this event and the time parameter.
+tmElements_t TidalEvent::TimeFrom(time_t time)
 {
-	// 2018-10-17T17:25:00
-	// Y - 0 4
-	// M - 5 2
-	// D - 8 2
-	// H - 11 2
-	// MM - 14 2
-	// S - 17 2
-	// Can be fractional seconds but we'll ignore them
+	tmElements_t result = tmElements_t();
 
-	DEBUGV("Year: " + time_string.substring(0, 4));
-	DEBUGV("Month: " + time_string.substring(5, 7));
-	DEBUGV("Day: " + time_string.substring(8, 10));
+	time_t diff = max(epochTime, time) - min(epochTime, time);
 
-	tm_data.Year = time_string.substring(0, 4).toInt() - 1970;
-	tm_data.Month = time_string.substring(5, 7).toInt();
-	tm_data.Day = time_string.substring(8, 10).toInt();
-	tm_data.Hour = time_string.substring(11, 13).toInt();
-	tm_data.Minute = time_string.substring(14, 16).toInt();
-	tm_data.Second = time_string.substring(17, 19).toInt();
+	// Take out the hours first
+	result.Hour = numberOfHours(diff);
+
+	// #define hoursToTime_t   ((H)) ( (H) * SECS_PER_HOUR)  
+	// macro in TimeLib.h not working, needs changed to
+	// #define hoursToTime_t(H) ( (H) * SECS_PER_HOUR)  
+	// but I don't want to break other people's code...
+	time_t hoursAsTimeT = result.Hour * SECS_PER_HOUR;
+
+	result.Minute = numberOfMinutes((diff - hoursAsTimeT));
+
+	return result;
 }

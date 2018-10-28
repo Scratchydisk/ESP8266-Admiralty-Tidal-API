@@ -92,17 +92,27 @@ const String ADMIRALTY_API_HOST = "admiraltyapi.azure-api.net";
 // Base API URL to fetch tidal station data.
 const String ADMIRALTY_STATIONS_URL = "https://" + ADMIRALTY_API_HOST + "/uktidalapi/api/V1/Stations/";
 
-// Structure to store the details of each tidal event
-struct TidalEvent
+// Class to store the details of each tidal event
+class TidalEvent
 {
+public:
+	// True if the record is a valid forecast.
+	// False typically implies a search method couldn't find a matching entry in the cache.
+	// i.e. trying to find the event after a time and the last entry is before the time.
+	bool isValid;
 	// True if the tidal forecast is for a high tide
 	bool isHighTide;
 	// ISO 8601 time stamp from API in GMT
 	String dateTime;
 	// Parsed time structure from the dateTime string (in GMT)
 	tmElements_t tm;
+	// Epoch time representation
+	time_t epochTime;
 	// Height in metres
 	float heightM;
+
+	// Number of hours and minutes between this event and the time parameter.
+	tmElements_t TimeFrom(time_t time);
 };
 
 
@@ -152,8 +162,15 @@ public:
 	AdmiraltyApiClient();
 
 	// Read tidal events from the Admiralty API for the supplied station and number of days forecast.
+	// Max value for numberDays is 7.
 	// Returns an ADMIRALTY_API_XXX status code.
 	uint8_t FetchTidalEvents(WiFiClientSecure wifiClient, uint8_t numberDays);
+
+	// Finds the tidal event immediately prior to the specified time
+	TidalEvent PreviousTidalEvent(time_t time);
+
+	// Finds the tidal event immediately after to the specified time
+	TidalEvent NextTidalEvent(time_t time);
 };
 
 #endif

@@ -22,7 +22,6 @@
     <!-- <ClInclude Include="$(MSBuildThisFileDirectory)AdmiraltyTidalApiClient.h" /> -->
     <None Include="$(MSBuildThisFileDirectory)..\License.txt" />
     <None Include="$(MSBuildThisFileDirectory)..\README.md" />
-    <None Include="$(MSBuildThisFileDirectory)examples\AdmiraltyExample.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AdmiraltyTidalApiClient.cpp" />
