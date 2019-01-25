@@ -58,7 +58,7 @@ uint8_t AdmiraltyApiClient::FetchTidalEvents(WiFiClientSecure wifiClient, uint8_
 	DEBUGV("IP of " + ADMIRALTY_API_HOST + " is " + hostIp.toString());
 	DEBUGV("\nStarting connection to server...");
 
-	if (!wifiClient.connect(ADMIRALTY_API_HOST, 443))
+	if (!wifiClient.connect(hostIp, 443))
 	{
 		DEBUGV("Connection failed!");
 		return ADMIRALTY_API_CONNECT_FAILED;
