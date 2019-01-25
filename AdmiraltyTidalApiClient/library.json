@@ -1,0 +1,13 @@
+{
+    "name": "UK-Admiralty-Tidal-API-Client",
+    "keywords": "tides, admiralty, uk",
+    "description": "Client wrapper around the UK Admiralty Tidal API. See https://admiraltyapi.portal.azure-api.net",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/Scratchydisk/ESP8266-Admiralty-Tidal-API"
+    },
+    "version": "1.1.0",
+    "frameworks": "esp8266",
+    "platforms": "*"
+}
