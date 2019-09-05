@@ -102,6 +102,8 @@ The example sketch shows how to connect to the API and retrieve two days' tidal 
     See [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino)
 	
 >If you get errors when the tidal client is trying to make a secure connection to the host then you probably need to update this project. There's a bug in earlier versions of the libaxtls.a library in the \tools\sdk\lib folder.
+>
+>Code changed to work with BearSSL so this shouldn't be an issue anymore.
 	
   * The Arduino Time Library
   
@@ -114,6 +116,9 @@ I've always been a fan of clarity over obfuscation and this is reflected in the 
 I strongly recommend the [Barr Group's Embedded C Coding Standard](https://barrgroup.com/Embedded-Systems/Books/Embedded-C-Coding-Standard).
 
 ## Change Log
+* 23 Aug 2019 - ESP8266 library uses BearSSL rather than axTLS now.
+    * Minor change needed to support non validation of TLS certificates. 
+
 * 28 Oct 2018 - Added time related functionality:
     * TidalEvent structure changed to class
 	* TidalEvent epoch (UNIX) time and isValid attributes

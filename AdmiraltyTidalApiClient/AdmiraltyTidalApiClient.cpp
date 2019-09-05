@@ -58,6 +58,11 @@ uint8_t AdmiraltyApiClient::FetchTidalEvents(WiFiClientSecure wifiClient, uint8_
 	DEBUGV("IP of " + ADMIRALTY_API_HOST + " is " + hostIp.toString());
 	DEBUGV("\nStarting connection to server...");
 
+	// ESP8266 API's TLS library has changed from 
+	// axTLS to BearSSL, so needs this...
+	if (!validateSslThumbprint)
+		wifiClient.setInsecure();
+
 	if (!wifiClient.connect(hostIp, 443))
 	{
 		DEBUGV("Connection failed!");
@@ -154,7 +159,7 @@ TidalEvent AdmiraltyApiClient::NextTidalEvent(time_t time)
 
 // Converts the ISO8601 string time representation from the API
 // into time elements.  Fractional parts of seconds are dropped.
-void AdmiraltyApiClient::convertFromIso8601(String time_string, tmElements_t & tm_data)
+void AdmiraltyApiClient::convertFromIso8601(String time_string, tmElements_t& tm_data)
 {
 	// 2018-10-17T17:25:00
 	// substring offsets:
@@ -166,7 +171,7 @@ void AdmiraltyApiClient::convertFromIso8601(String time_string, tmElements_t & t
 	// S - 17 19
 	// Can be fractional seconds but we'll ignore them
 
-	tm_data.Year = CalendarYrToTm(time_string.substring(0, 4).toInt());
+	tm_data.Year = time_string.substring(0, 4).toInt() - 1970;
 	tm_data.Month = time_string.substring(5, 7).toInt();
 	tm_data.Day = time_string.substring(8, 10).toInt();
 	tm_data.Hour = time_string.substring(11, 13).toInt();

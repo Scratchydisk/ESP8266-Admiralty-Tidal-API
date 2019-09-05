@@ -57,7 +57,7 @@ SOFTWARE.
 #include <WiFiClientSecure.h>
 #include <JsonListener.h>
 #include <JsonStreamingParser.h>
-#include <TimeLib.h>
+#include <ezTime.h>
 
 
 /*******************************/
