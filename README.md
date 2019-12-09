@@ -1,10 +1,12 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2dffbab911244b18b6d9f4f2fc911ba5)](https://www.codacy.com/manual/Scratchydisk/ESP8266-Admiralty-Tidal-API?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Scratchydisk/ESP8266-Admiralty-Tidal-API&amp;utm_campaign=Badge_Grade)
+
 # ESP8266 Admiralty Tidal API
 
 An ESP8266 / NodeMCU wrapper around the UK Admiralty's Tidal API.
 
 This library provides a simple means to fetch a set of tidal event forecasts for a specific UK tidal station.
 
-### To Do
+## To Do
 
 * Create Arduino library Zip file (I use Visual Micro for Visual Studio so don't need this).
 
